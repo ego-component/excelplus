@@ -17,3 +17,9 @@ func WithS3(s3 *eos.Component) Option {
 		o.s3 = s3
 	}
 }
+
+func WithEnableUpload(enableUpload bool) Option {
+	return func(o *Container) {
+		o.config.EnableUpload = enableUpload
+	}
+}

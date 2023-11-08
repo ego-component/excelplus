@@ -8,11 +8,13 @@ import (
 
 type config struct {
 	DefaultSheetName string
+	EnableUpload     bool
 }
 
 func defaultConfig() *config {
 	return &config{
 		DefaultSheetName: "Sheet1",
+		EnableUpload:     false,
 	}
 }
 
@@ -33,6 +35,13 @@ func (c *Container) Build(options ...Option) *Component {
 	for _, option := range options {
 		option(c)
 	}
+
+	// 如果开启了上传，那么就要判断s3是否为空
+	if c.config.EnableUpload && c.s3 == nil {
+		elog.Panic("s3 component is nil")
+		return nil
+	}
+
 	exFile := excelize.NewFile()
 	err := exFile.SetSheetName(exFile.GetSheetName(0), c.config.DefaultSheetName)
 	if err != nil {
@@ -40,6 +49,8 @@ func (c *Container) Build(options ...Option) *Component {
 		return nil
 	}
 	return &Component{
-		File: exFile,
+		File:   exFile,
+		config: c.config,
+		s3:     c.s3,
 	}
 }
