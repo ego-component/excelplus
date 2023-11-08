@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/ego-component/eos"
 	"github.com/gotomicro/ego/core/elog"
@@ -73,7 +74,15 @@ func (c *Component) NewSheet(sheetName string, rowStruct any) (*Sheet, error) {
 	}, nil
 }
 
+// SaveAs 写入本地文件或者上传到s3
+// 路径有 / 那么在本地和S3 自动创建文件夹
 func (c *Component) SaveAs(ctx context.Context, fileName string) error {
+	if strings.Contains(fileName, "/") {
+		err := os.MkdirAll(fileName[:strings.LastIndex(fileName, "/")], 0755)
+		if err != nil {
+			return fmt.Errorf("创建文件夹失败, err: %w", err)
+		}
+	}
 	err := c.File.SaveAs(fileName)
 	if err != nil {
 		return fmt.Errorf("保存到本地失败, err: %w", err)
