@@ -1,4 +1,4 @@
-package goexcel
+package excelplus
 
 import (
 	"bytes"

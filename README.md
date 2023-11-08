@@ -15,7 +15,7 @@ type SummaryBody struct {
 }
 
 //  创建一个 goexcel 实例
-excelFile := goexcel.Load().Build(moexcel.WithDefaultSheetName(firstSheet))
+excelFile := excelplus.Load().Build(moexcel.WithDefaultSheetName(firstSheet))
 
 // 创建一个 Sheet Header
 moSummarySheet := excelFile.MoNewSheet(firstSheet, SummaryBody{})
