@@ -50,6 +50,7 @@ func (c *Container) Build(options ...Option) *Component {
 	}
 	return &Component{
 		File:   exFile,
+		store: make(map[string]*Sheet),
 		config: c.config,
 		s3:     c.s3,
 	}
