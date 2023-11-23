@@ -17,6 +17,7 @@ type Component struct {
 	*excelize.File
 	config *config
 	s3     *eos.Component
+	store  map[string]*Sheet
 }
 
 // ABC 只支持一部分列，如果超过26列，需要修改这里
@@ -24,6 +25,11 @@ const ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 // NewSheet 新建sheet，同时所有操作都在这里面操作
 func (c *Component) NewSheet(sheetName string, rowStruct any) (*Sheet, error) {
+	oneSheet,flag := c.store[sheetName]
+	if flag {
+		return oneSheet,nil
+	}
+	
 	reflectType, _, err := checkFields(rowStruct)
 	if err != nil {
 		panic(err)
@@ -66,12 +72,14 @@ func (c *Component) NewSheet(sheetName string, rowStruct any) (*Sheet, error) {
 	if err != nil {
 		return nil, fmt.Errorf("设置sheetHeader默认样式失败, sheetName是"+sheetName+", err: %w", err)
 	}
-	return &Sheet{
+	sheetObj := &Sheet{
 		SheetName: sheetName,
 		Headers:   headers,
 		cursor:    1,
 		File:      c.File,
-	}, nil
+	}
+	c.store[sheetName] = sheetObj
+	return sheetObj, nil
 }
 
 // SaveAs 写入本地文件或者上传到s3
